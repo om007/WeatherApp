@@ -2,7 +2,7 @@
 //  HttpUtility.swift
 //  WeatherApp
 //
-//  Created by Om Prakash Shah on 8/11/22.
+//  Created by Om Prakash Shah on 8/15/22.
 //
 
 import Foundation
@@ -15,22 +15,22 @@ public class HttpUtility {
 
     private init() {}
     
-    public func request<T:Decodable>(huRequest: HttpRequest, resultType: T.Type, completionHandler: @escaping(Result<T?, HttpNetworkError>) -> Void) {
-        switch huRequest.method {
+    public func request<T:Decodable>(httpRequest: HttpRequest, resultType: T.Type, completionHandler: @escaping(Result<T?, HttpNetworkError>) -> Void) {
+        switch httpRequest.method {
         case .get:
-            getData(requestUrl: huRequest.url, resultType: resultType) { completionHandler($0) }
+            getData(requestUrl: httpRequest.url, resultType: resultType) { completionHandler($0) }
             break
 
         case .post:
-            postData(request: huRequest, resultType: resultType) { completionHandler($0) }
+            postData(request: httpRequest, resultType: resultType) { completionHandler($0) }
             break
 
         case .put:
-            putData(requestUrl: huRequest.url, resultType: resultType) { completionHandler($0) }
+            putData(requestUrl: httpRequest.url, resultType: resultType) { completionHandler($0) }
             break
 
         case .delete:
-            deleteData(requestUrl: huRequest.url, resultType: resultType) { completionHandler($0) }
+            deleteData(requestUrl: httpRequest.url, resultType: resultType) { completionHandler($0) }
             break
         }
     }
@@ -66,7 +66,7 @@ public class HttpUtility {
     // MARK: - GET Api
     private func getData<T:Decodable>(requestUrl: URL, resultType: T.Type, completionHandler:@escaping(Result<T?, HttpNetworkError>) -> Void) {
         var urlRequest = self.createUrlRequest(requestUrl: requestUrl)
-        urlRequest.httpMethod = HUHttpMethods.get.rawValue
+        urlRequest.httpMethod = HTTPMethods.get.rawValue
 
         performOperation(requestUrl: urlRequest, responseType: T.self) { (result) in
             completionHandler(result)
@@ -76,7 +76,7 @@ public class HttpUtility {
     // MARK: - POST Api
     private func postData<T:Decodable>(request: HttpRequest, resultType: T.Type, completionHandler:@escaping(Result<T?, HttpNetworkError>) -> Void) {
         var urlRequest = self.createUrlRequest(requestUrl: request.url)
-        urlRequest.httpMethod = HUHttpMethods.post.rawValue
+        urlRequest.httpMethod = HTTPMethods.post.rawValue
         urlRequest.httpBody = request.requestBody
         urlRequest.addValue("application/json", forHTTPHeaderField: "content-type")
 
@@ -88,7 +88,7 @@ public class HttpUtility {
     // MARK: - PUT Api
     private func putData<T:Decodable>(requestUrl: URL, resultType: T.Type, completionHandler:@escaping(Result<T?, HttpNetworkError>) -> Void) {
         var urlRequest = self.createUrlRequest(requestUrl: requestUrl)
-        urlRequest.httpMethod = HUHttpMethods.put.rawValue
+        urlRequest.httpMethod = HTTPMethods.put.rawValue
 
         performOperation(requestUrl: urlRequest, responseType: T.self) { (result) in
             completionHandler(result)
@@ -98,7 +98,7 @@ public class HttpUtility {
     // MARK: - DELETE Api
     private func deleteData<T:Decodable>(requestUrl: URL, resultType: T.Type, completionHandler:@escaping(Result<T?, HttpNetworkError>) -> Void) {
         var urlRequest = self.createUrlRequest(requestUrl: requestUrl)
-        urlRequest.httpMethod = HUHttpMethods.delete.rawValue
+        urlRequest.httpMethod = HTTPMethods.delete.rawValue
 
         performOperation(requestUrl: urlRequest, responseType: T.self) { (result) in
             completionHandler(result)
