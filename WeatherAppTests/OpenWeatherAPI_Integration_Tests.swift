@@ -1,6 +1,6 @@
 //
-//  WeatherAppTests.swift
-//  WeatherAppTests
+//  OpenWeatherAPI_Integration_Tests.swift
+//  OpenWeatherAPI_Integration_Tests
 //
 //  Created by Om Prakash Shah on 8/15/22.
 //
@@ -8,7 +8,7 @@
 import XCTest
 @testable import WeatherApp
 
-class WeatherAppTests: XCTestCase {
+class OpenWeatherAPI_Integration_Tests: XCTestCase {
 
     private var httpUtility = HttpUtility.shared
 
@@ -28,21 +28,28 @@ class WeatherAppTests: XCTestCase {
         searchRequest.scheme = "http"
         searchRequest.host = CommonConsts.APIEndPoint_LocationSearch
         searchRequest.path = "/geo/1.0/direct"
-        searchRequest.queryItems = [URLQueryItem(name: "q", value: name),
-                                    URLQueryItem(name: "limit", value: "\(5)"),
-                                    URLQueryItem(name: "units", value: "metric"),
-                                    URLQueryItem(name: "appid", value: CommonConsts.APIKey_OpenWeather)]
+        let queryItems: [String : String] = ["q": name,
+                                             "limit" : "5",
+                                             "units" : "metric",
+                                             "appid" : CommonConsts.APIKey_OpenWeather]
+        searchRequest.queryItems  = WeatherViewModel.getQueryItems(from: queryItems)
         
         let expectation = XCTestExpectation(description: "Location received from OpenWeather API")
         let httpRequest = HttpRequest(withUrl: searchRequest.url!, forHttpMethod: .get)
 
+        //ACT
         httpUtility.request(httpRequest: httpRequest, resultType: [LocationResponse].self) { (response) in
             switch response {
             case .success(let locations):
                 // ASSERT
                 XCTAssertNotNil(locations)
-                XCTAssertEqual(locations?.first?.name, name)
                 XCTAssertLessThanOrEqual(locations?.count ?? 0, limit)
+                
+                //Checking each location result name against the input name by the user to be a substring
+                for location in locations ?? [] {
+                    let resultValid = location.name?.contains(name) ?? false
+                    XCTAssert(resultValid)
+                }
                 
             case .failure(let error):
                 // ASSERT
@@ -69,15 +76,18 @@ class WeatherAppTests: XCTestCase {
         weatherRequest.scheme = "https"
         weatherRequest.host = CommonConsts.APIEndPoint_WeatherDetail
         weatherRequest.path = "/data/2.5/weather"
-        weatherRequest.queryItems = [URLQueryItem(name: "lat", value: "\(lat)"),
-                                     URLQueryItem(name: "lon", value: "\(lon)"),
-                                     URLQueryItem(name: "units", value: "metric"),
-                                     URLQueryItem(name: "exclude", value: "minutely,hourly,daily"),
-                                     URLQueryItem(name: "appid", value: CommonConsts.APIKey_OpenWeather)]
+        let queryItems: [String : String] = ["lat" : "\(lat)",
+                                             "lon" : "\(lon)",
+                                             "units" : "metric",
+                                             "exclude" : "minutely,hourly,daily",
+                                             "appid" : CommonConsts.APIKey_OpenWeather]
         
+        weatherRequest.queryItems = WeatherViewModel.getQueryItems(from: queryItems)
+
         let expectation = XCTestExpectation(description: "Weather detail from OpenWeather API")
         let httpRequest = HttpRequest(withUrl: weatherRequest.url!, forHttpMethod: .get)
         
+        //ACT
         httpUtility.request(httpRequest: httpRequest, resultType: WeatherResponse.self) { (response) in
             switch response {
             case .success(let weatherResponse):

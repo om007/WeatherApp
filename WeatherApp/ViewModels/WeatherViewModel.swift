@@ -12,6 +12,8 @@ class WeatherViewModel {
     
     @Published var locationResults = [LocationResponse]()
     @Published var weatherDetail: WeatherResponse?
+    
+    let limit = 5
 
     func searchLocations(_ name: String) {
         
@@ -19,10 +21,11 @@ class WeatherViewModel {
         searchRequest.scheme = "http"
         searchRequest.host = CommonConsts.APIEndPoint_LocationSearch
         searchRequest.path = "/geo/1.0/direct"
-        searchRequest.queryItems = [URLQueryItem(name: "q", value: name),
-                                    URLQueryItem(name: "limit", value: "5"),
-                                    URLQueryItem(name: "units", value: "metric"),
-                                    URLQueryItem(name: "appid", value: CommonConsts.APIKey_OpenWeather)]
+        let queryItems: [String : String] = ["q": name,
+                                             "limit" : "\(limit)",
+                                             "units" : "metric",
+                                             "appid" : CommonConsts.APIKey_OpenWeather]
+        searchRequest.queryItems  = WeatherViewModel.getQueryItems(from: queryItems)
         
         let httpRequest = HttpRequest(withUrl: searchRequest.url!, forHttpMethod: .get)
         HttpUtility.shared.request(httpRequest: httpRequest, resultType: [LocationResponse].self) { [weak self] result in
@@ -36,6 +39,7 @@ class WeatherViewModel {
             case .failure(let error):
                 //Failed to retrive locations from search request
                 //completion(.failure(error))
+                self?.locationResults = []
                 print(error.reason ?? "Error!")
             }
         }
@@ -47,11 +51,13 @@ class WeatherViewModel {
         weatherRequest.scheme = "https"
         weatherRequest.host = CommonConsts.APIEndPoint_WeatherDetail
         weatherRequest.path = "/data/2.5/weather"
-        weatherRequest.queryItems = [URLQueryItem(name: "lat", value: "\(lat)"),
-                                     URLQueryItem(name: "lon", value: "\(lon)"),
-                                     URLQueryItem(name: "units", value: "metric"),
-                                     URLQueryItem(name: "exclude", value: "minutely,hourly,daily"),
-                                     URLQueryItem(name: "appid", value: CommonConsts.APIKey_OpenWeather)]
+        let queryItems: [String : String] = ["lat" : "\(lat)",
+                                             "lon" : "\(lon)",
+                                             "units" : "metric",
+                                             "exclude" : "minutely,hourly,daily",
+                                             "appid" : CommonConsts.APIKey_OpenWeather]
+        
+        weatherRequest.queryItems = WeatherViewModel.getQueryItems(from: queryItems)
 
         let httpRequest = HttpRequest(withUrl: weatherRequest.url!, forHttpMethod: .get)
         HttpUtility.shared.request(httpRequest: httpRequest, resultType: WeatherResponse.self) { [weak self] result in
@@ -62,9 +68,14 @@ class WeatherViewModel {
                 
             case .failure(let error):
                 //Failed to retrive weather details for selected location
+                self?.weatherDetail = nil
                 print(error.reason ?? "Error!")
             }
         }
+    }
+    
+    static func getQueryItems(from: [String: String]) -> [URLQueryItem] {
+        return  from.map { URLQueryItem(name: $0.key, value: $0.value) }
     }
     
 }

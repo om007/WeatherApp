@@ -15,10 +15,6 @@ public struct LocationResponse: Decodable {
     var lat: Double?
     var lon: Double?
     
-//    enum CodingKeys: String, CodingKey {
-//        case name, state, country, lat, lon
-//    }
-    
     internal init(cityName: String? = nil, state: String? = nil, country: String? = nil, lat: Double? = nil, lon: Double? = nil) {
         self.name = cityName
         self.state = state

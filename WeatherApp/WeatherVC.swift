@@ -98,59 +98,69 @@ class WeatherVC: UIViewController {
         weatherViewModel.$weatherDetail
             .receive(on: DispatchQueue.main)
             .sink { [unowned self] weatherInfo in
-                //Displaying weather detail
-                updateDetailView(weatherDetail: weatherInfo)
+                if let weather = weatherInfo {
+                    //Displaying weather detail
+                    updateDetailView(weatherDetail: weather)
+                } else {
+                    displayWeatherError()
+                }
                 loadingAlert.dismiss(animated: false)
             }.store(in: &cancellables)
     }
     
-    func updateDetailView(weatherDetail: WeatherResponse?) {
+    func updateDetailView(weatherDetail: WeatherResponse) {
         resultsTableView.isHidden = true
-        hideAllInfoLabels()
-        if weatherDetail != nil {
-            if let name = weatherDetail?.name {
-                locationLabel.text = name.uppercased()
-                locationLabel.isHidden = false
-            }
-            if let condition = weatherDetail?.weather?.main {
-                conditionLabel.text = "Condition: \(condition)"
-                conditionLabel.isHidden = false
-            }
-            if let description = weatherDetail?.weather?.description {
-                descriptionLabel.text = "Description: \(description)"
-                descriptionLabel.isHidden = false
-            }
-            if let temp = weatherDetail?.weather?.temp {
-                temperatureLabel.text = "Current temperature: \(temp) degrees celcius"
-                temperatureLabel.isHidden = false
-            }
-            if let min_temp = weatherDetail?.weather?.temp_min {
-                min_temperatureLabel.text = "Minimum temperature: \(min_temp) degrees celcius"
-                min_temperatureLabel.isHidden = false
-            }
-            if let max_temp = weatherDetail?.weather?.temp_max {
-                max_temperatureLabel.text = "Maximum temperature: \(max_temp) degrees celcius"
-                max_temperatureLabel.isHidden = false
-            }
-            if let humidity = weatherDetail?.weather?.humidity {
-                humidityLabel.text = "Humidity: \(humidity) g/m3"
-                humidityLabel.isHidden = false
-            }
-            if let timezone = weatherDetail?.timezone {
-                timezoneLabel.text = "Timezone: \(timezone)"
-                timezoneLabel.isHidden = false
-            }
+        hideWeatherInfoViews()
             
-            if let iconName = weatherDetail?.weather?.icon {
-                let weatherIconUrl = URL(string: CommonConsts.openWeatherIconUrl)?.appendingPathComponent("\(iconName).png")
-                weatherImageView.sd_setImage(with: weatherIconUrl, placeholderImage: UIImage(named: "Landscape")?.withTintColor(.systemTeal))
-                weatherImageView.isHidden = false
-            }
-            weatherDetailContrinerScrollView.isHidden = false
+        if let name = weatherDetail.name {
+            locationLabel.text = name.uppercased()
+            locationLabel.isHidden = false
         }
+        if let condition = weatherDetail.weather?.main {
+            conditionLabel.text = "Condition: \(condition)"
+            conditionLabel.isHidden = false
+        }
+        if let description = weatherDetail.weather?.description {
+            descriptionLabel.text = "Description: \(description)"
+            descriptionLabel.isHidden = false
+        }
+        if let temp = weatherDetail.weather?.temp {
+            temperatureLabel.text = "Current temperature: \(temp) degrees celcius"
+            temperatureLabel.isHidden = false
+        }
+        if let min_temp = weatherDetail.weather?.temp_min {
+            min_temperatureLabel.text = "Min temperature: \(min_temp) degrees celcius"
+            min_temperatureLabel.isHidden = false
+        }
+        if let max_temp = weatherDetail.weather?.temp_max {
+            max_temperatureLabel.text = "Max temperature: \(max_temp) degrees celcius"
+            max_temperatureLabel.isHidden = false
+        }
+        if let humidity = weatherDetail.weather?.humidity {
+            humidityLabel.text = "Humidity: \(humidity) g/m3"
+            humidityLabel.isHidden = false
+        }
+        if let timezone = weatherDetail.timezone {
+            timezoneLabel.text = "Timezone: \(timezone)"
+            timezoneLabel.isHidden = false
+        }
+        
+        if let iconName = weatherDetail.weather?.icon {
+            let weatherIconUrl = URL(string: CommonConsts.openWeatherIconUrl)?.appendingPathComponent("\(iconName).png")
+            weatherImageView.sd_setImage(with: weatherIconUrl, placeholderImage: UIImage(named: "Landscape")?.withTintColor(.systemTeal))
+            weatherImageView.isHidden = false
+        }
+        weatherDetailContrinerScrollView.isHidden = false
     }
     
-    func hideAllInfoLabels() {
+    func displayWeatherError() {
+        resultsTableView.isHidden = true
+        hideWeatherInfoViews()
+        locationLabel.isHidden = false
+        locationLabel.text = ErrorMessage.noWeatherDetails
+    }
+    
+    func hideWeatherInfoViews() {
         locationLabel.isHidden = true
         conditionLabel.isHidden = true
         descriptionLabel.isHidden = true
