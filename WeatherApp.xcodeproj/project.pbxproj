@@ -137,6 +137,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		96BA7F3A28AE087000912F97 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				96E01AE728A4E838004B649E /* WeatherVC.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
 		96E01AD728A4E838004B649E = {
 			isa = PBXGroup;
 			children = (
@@ -163,10 +171,10 @@
 				96E01AE328A4E838004B649E /* AppDelegate.swift */,
 				96E01AE528A4E838004B649E /* SceneDelegate.swift */,
 				96E01AE928A4E838004B649E /* Main.storyboard */,
-				96E01AE728A4E838004B649E /* WeatherVC.swift */,
 				96E01AEC28A4E839004B649E /* Assets.xcassets */,
 				96E01AEE28A4E839004B649E /* LaunchScreen.storyboard */,
 				96E01AF128A4E839004B649E /* Info.plist */,
+				96BA7F3A28AE087000912F97 /* ViewControllers */,
 				96E01AF828A4E8DF004B649E /* Models */,
 				6E880DE428A76C0D0019C462 /* Views */,
 				6E880DE528A76C200019C462 /* ViewModels */,

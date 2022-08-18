@@ -25,6 +25,7 @@ class WeatherVC: UIViewController {
     @IBOutlet weak var timezoneLabel: UILabel!
     @IBOutlet weak var weatherImageView: UIImageView!
     
+    /// An UIAlertController instance when presented indicates that the API request is still being processed.
     lazy var loadingAlert: UIAlertController = {
         let alert = UIAlertController(title: nil, message: AlertTitle.pleaseWait, preferredStyle: .alert)
         let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 80, height: 50))
@@ -84,6 +85,7 @@ class WeatherVC: UIViewController {
         removeObservers()
     }
     
+    /// This is where we bind with data models declared in WeatherViewModel
     func setupBinders() {
         weatherViewModel.$locationResults
             .receive(on: DispatchQueue.main)
@@ -108,6 +110,7 @@ class WeatherVC: UIViewController {
             }.store(in: &cancellables)
     }
     
+    /// Call this method when we want to update the detail view whenever user taps location from the search suggestions list
     func updateDetailView(weatherDetail: WeatherResponse) {
         resultsTableView.isHidden = true
         hideWeatherInfoViews()
@@ -153,6 +156,7 @@ class WeatherVC: UIViewController {
         weatherDetailContrinerScrollView.isHidden = false
     }
     
+    /// This method displays error if encountered when weather detail for requested location couldn't be fetched from OpenWeather API
     func displayWeatherError() {
         resultsTableView.isHidden = true
         hideWeatherInfoViews()
@@ -160,6 +164,7 @@ class WeatherVC: UIViewController {
         locationLabel.text = ErrorMessage.noWeatherDetails
     }
     
+    /// Resetting all the views for before displaying the detail
     func hideWeatherInfoViews() {
         locationLabel.isHidden = true
         conditionLabel.isHidden = true
@@ -172,6 +177,7 @@ class WeatherVC: UIViewController {
         weatherImageView.isHidden = true
     }
     
+    /// This method causes the view or subviews to dismiss the keybard
     @objc func dismissKeyboard() {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
@@ -205,6 +211,7 @@ class WeatherVC: UIViewController {
     }
 }
 
+// MARK: Location suggestions tableView delegate and datasource implementation
 extension WeatherVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -235,7 +242,7 @@ extension WeatherVC: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-// UISearchBar Delegate Implementation
+// MARK: UISearchBar Delegate Implementation
 extension WeatherVC: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -259,7 +266,7 @@ extension WeatherVC: UISearchBarDelegate {
     
 }
 
-// UISearchBar Delegate Implementation
+// MARK: UISearchBar Delegate Implementation
 extension WeatherVC: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -272,7 +279,7 @@ extension WeatherVC: UITextFieldDelegate {
     }
 }
 
-//Handle tap gesture
+// MARK: Handle tap gesture
 extension WeatherVC: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {

@@ -15,6 +15,7 @@ class WeatherViewModel {
     
     let limit = 5
 
+    /// This method triggers location search to OpenWeather API by name. Also, notifies the observers attached with the location results.
     func searchLocations(_ name: String) {
         
         var searchRequest = URLComponents()
@@ -45,6 +46,7 @@ class WeatherViewModel {
         }
     }
     
+    /// This method requests OpenWeather API for the weather details from latitude and longitude. Also, notifies the observers attached with the weather details.
     func getWeatherInfo(lat: Double, lon: Double) {
         
         var weatherRequest = URLComponents()
@@ -74,6 +76,9 @@ class WeatherViewModel {
         }
     }
     
+    /// A static method that creates an array of 'UIQueryItem' objects from dictionary of type [String : String] to be used with 'URLComponents' class's 'queryItems' property
+    ///
+    /// - Returns: An array of UIQueryItem objects to be used with 'URLComponents' class
     static func getQueryItems(from: [String: String]) -> [URLQueryItem] {
         return  from.map { URLQueryItem(name: $0.key, value: $0.value) }
     }
